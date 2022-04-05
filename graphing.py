@@ -78,3 +78,5 @@ for sentence in sent:
 finalstring = finalstring[0:len(finalstring)-1] + "."
 finalstring = finalstring.replace("je ai", "j'ai")
 print(finalstring)
+
+
