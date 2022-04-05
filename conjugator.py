@@ -8,6 +8,7 @@ passe = ['ai', 'as', 'a', 'avons', 'avez', 'vont', 'suis', 'es', 'est','sommes',
 
 def SentanceConstruct(words, conjugated, subject, unconjugated, infinitifetpasse):
 	finalsentance = ""
+	print(words, conjugated, subject, unconjugated, infinitifetpasse)
 	for word in words:
 		if word == unconjugated:
 			finalsentance = finalsentance + conjugated[1]
@@ -28,8 +29,21 @@ def IsFeminine(subject):
 		return subject, 2
 	return subject, 0
 
+def Jeify(words, subject, converb, subjectverb, index):
+		converb = converb.split(" ")
+		subjectverb.append(converb[0])
+		if len(converb) > 1:
+			subjectverb.append(converb[1])
+			words[index+1] = converb[1]
+			words.pop(index+2)
+		else:
+			subjectverb.append("")
+			words.pop(index+1)
+		subjectverb.append("")
+		words[index] = converb[0]
+		return subjectverb, words
 
-def Present(subject, verb):
+def Present(subject, verb, words, index):
 	subjectverb = []
 	converbs = cg.conjugate(verb)['moods']['indicatif']['présent']
 	fem = IsFeminine(subject)[1]
@@ -47,11 +61,8 @@ def Present(subject, verb):
 			subjectverb.append("")
 			return subjectverb
 		if subject == "je" and "j'" in converb:
-			subjectverb.append(converb[0])
-			subjectverb.append("")
-			subjectverb.append("")
-
-			return subjectverb
+			print("bonjour")
+			return Jeify(words, subject, converb, subjectverb, index)
 
 
 
@@ -74,9 +85,10 @@ def Future(subject, verb):
 			return subjectallerverb
 
 
-def Preference(subject, verb):
+def Preference(subject, verb, words, index):
 	subjectallerverb = []
 	converbs = cg.conjugate(verb)['moods']['indicatif']['présent']
+	print(converbs)
 	fem = IsFeminine(subject)[1]
 	subject = IsFeminine(subject)[0]
 	for converb in converbs:
@@ -91,6 +103,8 @@ def Preference(subject, verb):
 			subjectallerverb.append(converb[1])
 			subjectallerverb.append(verb)
 			return subjectallerverb
+		if subject == "je" and "j'" in converb:
+			return Jeify(words, subject, converb, subjectallerverb, index)
 
 
 def Past(subject, avoirouetre, verb, words, index):
@@ -113,14 +127,8 @@ def Past(subject, avoirouetre, verb, words, index):
 			words[index+2] = converb[2]
 			return subjectavoirouetreverb, words
 		if subject == "je" and "j'" in converb:
-			converb = converb.split(" ")
-			subjectavoirouetreverb.append(converb[0])
-			subjectavoirouetreverb.append(converb[1])
-			subjectavoirouetreverb.append("")
-			words[index] = converb[0]
-			words.pop(index+1)
-			words[index+1] = converb[1]
-			return subjectavoirouetreverb, words
+			return Jeify(words, subject, converb, subjectavoirouetreverb, index)
+	
 
 
 
@@ -156,18 +164,18 @@ def ConSentance(strthing):
 				converb = Past(currentsub, word, words[i+1], words, currentsublocated)
 				finalstring = finalstring +  SentanceConstruct(converb[1], converb[0], currentsub, word, "") + "\n"
 			elif word in preference:
-				converb = Preference(currentsub, word)
-				finalstring = finalstring +  SentanceConstruct(words, converb, currentsub, word, "") + "\n"
+				converb = Preference(currentsub, word, words, currentsublocated)
+				finalstring = finalstring +  SentanceConstruct(converb[1], converb[0], currentsub, word, "") + "\n"
 			elif word in verbs and (word[i-1] not in passe):
-				converb = Present(currentsub, word)
+				converb = Present(currentsub, word, words, currentsublocated)
 				finalstring = finalstring + SentanceConstruct(words, converb, currentsub, word, "") + "\n"
 	print(finalstring)
 				
 ConSentance(strthing = input("enter a sentence to conjugate -> ").lower())
 #fix multiple verbs going through different conjugations in a weird way (try entering "je avoir manger une pomme et aller manger une pomme, tu manger une pomme")
 #add negative (is it better to recognize the negative pieces or is it better to deconstruct the sentance? If we deconstruct the sentance we will have to be careful about multiple negatives in one sentance)
-#add more "preference" verbs (more verbs where the verb will be after and will be at the infinitive)
-#make it so that "preference" verbs with multiple words (like arriver à) can work with keeping the next verb at the infinitive
+#fix present tense not being able to jeify
+#make it so that "preference" verbs with multiple words (like arriver à/refuser de/d') can work with keeping the next verb at the infinitive
 #add a way to grab unique subjects
 #maybe we should grab subjects first because it might also just give us a way to grab the verb too or something and that could be helpful except very maddening because it would mean that we would have to rework this entire system AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 

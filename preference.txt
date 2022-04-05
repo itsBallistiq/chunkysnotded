@@ -2,3 +2,8 @@ aimer
 préférer
 détester
 adorer
+espérer
+savoir
+pouvoir
+vouloir
+devoir
