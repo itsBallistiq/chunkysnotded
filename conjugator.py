@@ -5,6 +5,7 @@ plursing2 = [1, 2, 3, 3, 3, 4, 5, 6, 6]
 verbs = open("verbs.txt", "r", encoding="utf8").read().splitlines()
 preference = open("preference.txt", "r", encoding="utf8").read().splitlines()
 passe = ['ai', 'as', 'a', 'avons', 'avez', 'vont', 'suis', 'es', 'est','sommes', 'êtes', 'sont']
+
 def SentanceConstruct(words, conjugated, subject, unconjugated, infinitifetpasse):
 	finalsentance = ""
 	for word in words:
@@ -121,12 +122,18 @@ def Past(subject, avoirouetre, verb, words, index):
 			words[index+1] = converb[1]
 			return subjectavoirouetreverb, words
 
+
+
 def ConSentance(strthing):
 	strthing = strthing.replace(".", ",")
 	strthing = strthing.lower()
 	sentances = strthing.split(",")
+	subjectstack = []
+	finalstring = ""
 	for sentance in sentances:
 		words = sentance.split(" ")
+		while "" in words:
+			words.remove("")
 		currentsub = ""
 		currentsublocated = 0
 		allerfound = False
@@ -137,29 +144,30 @@ def ConSentance(strthing):
 				allerfound = True
 			if word in subjects:
 				currentsub = word
+				subjectstack.append(currentsub)
+				if len(subjectstack) > 1:
+					subjectstack.pop(0)
+					currentsub = subjectstack[0] # <--------- redundant but better safe than sorry
 				currentsublocated = i
 			if i < len(words)-1 and allerfound and word in verbs and word != "aller":
 				converb = Future(currentsub, word)
-				constructedsentance = SentanceConstruct(words, converb, currentsub, "aller", word)
-				print(constructedsentance)
-			if i < len(words)-1 and (word == "avoir" or word == "être") and words[i+1] in verbs:
+				finalstring = finalstring +  SentanceConstruct(words, converb, currentsub, "aller", word) + "\n"
+			elif i < len(words)-1 and (word == "avoir" or word == "être") and words[i+1] in verbs:
 				converb = Past(currentsub, word, words[i+1], words, currentsublocated)
-				constructedsentance = SentanceConstruct(converb[1], converb[0], currentsub, word, "")
-				print(constructedsentance)
-			if word in preference:
+				finalstring = finalstring +  SentanceConstruct(converb[1], converb[0], currentsub, word, "") + "\n"
+			elif word in preference:
 				converb = Preference(currentsub, word)
-				constructedsentance = SentanceConstruct(words, converb, currentsub, word, "")
-				print(constructedsentance)
+				finalstring = finalstring +  SentanceConstruct(words, converb, currentsub, word, "") + "\n"
 			elif word in verbs and (word[i-1] not in passe):
 				converb = Present(currentsub, word)
-				constructedsentance = SentanceConstruct(words, converb, currentsub, word, "")
-				print(constructedsentance)
+				finalstring = finalstring + SentanceConstruct(words, converb, currentsub, word, "") + "\n"
+	print(finalstring)
+				
 ConSentance(strthing = input("enter a sentence to conjugate -> ").lower())
-#add multiple verbs / multiple subjects
-#add negative
+#fix multiple verbs going through different conjugations in a weird way (try entering "je avoir manger une pomme et aller manger une pomme, tu manger une pomme")
+#add negative (is it better to recognize the negative pieces or is it better to deconstruct the sentance? If we deconstruct the sentance we will have to be careful about multiple negatives in one sentance)
 #add more "preference" verbs (more verbs where the verb will be after and will be at the infinitive)
 #make it so that "preference" verbs with multiple words (like arriver à) can work with keeping the next verb at the infinitive
-#add faire series (i.e. faire les courses, faire du shopping, faire des courses, faire enregistrer)
 #add a way to grab unique subjects
 #maybe we should grab subjects first because it might also just give us a way to grab the verb too or something and that could be helpful except very maddening because it would mean that we would have to rework this entire system AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
