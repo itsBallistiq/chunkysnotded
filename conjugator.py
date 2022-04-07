@@ -8,7 +8,6 @@ passe = ['ai', 'as', 'a', 'avons', 'avez', 'vont', 'suis', 'es', 'est','sommes',
 
 def SentanceConstruct(words, conjugated, subject, unconjugated, infinitifetpasse):
 	finalsentance = ""
-	print(words, conjugated, subject, unconjugated, infinitifetpasse)
 	for word in words:
 		if word == unconjugated:
 			finalsentance = finalsentance + conjugated[1]
@@ -19,6 +18,11 @@ def SentanceConstruct(words, conjugated, subject, unconjugated, infinitifetpasse
 		finalsentance = finalsentance + " "
 	return finalsentance
 
+def GoThrough(passe, word):
+	for i in passe:
+		if i == word:
+			return True
+	return False
 
 def IsFeminine(subject):
 	if subject == "elle":
@@ -61,7 +65,6 @@ def Present(subject, verb, words, index):
 			subjectverb.append("")
 			return subjectverb
 		if subject == "je" and "j'" in converb:
-			print("bonjour")
 			return Jeify(words, subject, converb, subjectverb, index)
 
 
@@ -88,7 +91,6 @@ def Future(subject, verb):
 def Preference(subject, verb, words, index):
 	subjectallerverb = []
 	converbs = cg.conjugate(verb)['moods']['indicatif']['présent']
-	print(converbs)
 	fem = IsFeminine(subject)[1]
 	subject = IsFeminine(subject)[0]
 	for converb in converbs:
@@ -159,14 +161,14 @@ def ConSentance(strthing):
 				currentsublocated = i
 			if i < len(words)-1 and allerfound and word in verbs and word != "aller":
 				converb = Future(currentsub, word)
-				finalstring = finalstring +  SentanceConstruct(words, converb, currentsub, "aller", word) + "\n"
+				finalstring = finalstring + SentanceConstruct(words, converb, currentsub, "aller", word) + "\n"
 			elif i < len(words)-1 and (word == "avoir" or word == "être") and words[i+1] in verbs:
 				converb = Past(currentsub, word, words[i+1], words, currentsublocated)
-				finalstring = finalstring +  SentanceConstruct(converb[1], converb[0], currentsub, word, "") + "\n"
+				finalstring = finalstring + SentanceConstruct(converb[1], converb[0], currentsub, word, "") + "\n"
 			elif word in preference:
 				converb = Preference(currentsub, word, words, currentsublocated)
-				finalstring = finalstring +  SentanceConstruct(converb[1], converb[0], currentsub, word, "") + "\n"
-			elif word in verbs and (word[i-1] not in passe):
+				finalstring = finalstring + SentanceConstruct(converb[1], converb[0], currentsub, word, "") + "\n"
+			elif word in verbs and GoThrough(passe, word) == False:
 				converb = Present(currentsub, word, words, currentsublocated)
 				finalstring = finalstring + SentanceConstruct(words, converb, currentsub, word, "") + "\n"
 	print(finalstring)
@@ -174,7 +176,6 @@ def ConSentance(strthing):
 ConSentance(strthing = input("enter a sentence to conjugate -> ").lower())
 #fix multiple verbs going through different conjugations in a weird way (try entering "je avoir manger une pomme et aller manger une pomme, tu manger une pomme")
 #add negative (is it better to recognize the negative pieces or is it better to deconstruct the sentance? If we deconstruct the sentance we will have to be careful about multiple negatives in one sentance)
-#fix present tense not being able to jeify
 #make it so that "preference" verbs with multiple words (like arriver à/refuser de/d') can work with keeping the next verb at the infinitive
 #add a way to grab unique subjects
 #maybe we should grab subjects first because it might also just give us a way to grab the verb too or something and that could be helpful except very maddening because it would mean that we would have to rework this entire system AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
