@@ -68,6 +68,7 @@ def VerbParse(strthing):
 
 
 def Conjugate():
+	print(dictionary)
 	for i in range(len(dictionary["subject"])):
 		checksub = False
 		if i < len(dictionary["subject"]):
@@ -87,6 +88,8 @@ def Conjugate():
 				else:
 					if verb in verbs:
 						converbs = cg.conjugate(verb)['moods']['indicatif']['présent']
+						if converbs[0][0:2] == "j'":
+							converbs[0] = "je " + converbs[0][2:]
 						for converb in converbs:
 							converb = converb.split(" ")
 							for i in converb:
@@ -102,6 +105,8 @@ def Conjugate():
 				else:
 					if verb in verbs:
 						converbs = cg.conjugate(verb)['moods']['indicatif']['passé-composé']
+						if converbs[0][0:2] == "j'":
+							converbs[0] = "je " + converbs[0][2:]
 						for converb in converbs:
 							converb = converb.split(" ")
 							for i in converb:
