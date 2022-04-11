@@ -175,8 +175,8 @@ def ConSentance(strthing):
 				
 ConSentance(strthing = input("enter a sentence to conjugate -> ").lower())
 #fix multiple verbs going through different conjugations in a weird way (try entering "je avoir manger une pomme et aller manger une pomme, tu manger une pomme")
+#fix past tense using avoir instead of etre
+#i have no idea what to do this is so annyoing and its so many errors and its so hard to fix 
 #add negative (is it better to recognize the negative pieces or is it better to deconstruct the sentance? If we deconstruct the sentance we will have to be careful about multiple negatives in one sentance)
 #make it so that "preference" verbs with multiple words (like arriver à/refuser de/d') can work with keeping the next verb at the infinitive
-#add a way to grab unique subjects
-#maybe we should grab subjects first because it might also just give us a way to grab the verb too or something and that could be helpful except very maddening because it would mean that we would have to rework this entire system AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
