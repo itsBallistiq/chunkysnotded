@@ -1,4 +1,5 @@
 from verbecc import Conjugator
+from napoleanbenepar import parsesub
 cg = Conjugator(lang='fr')
 subjects = ["je", "tu", "il", "elle", "on", "nous", "vous", "ils", "elles"]
 plursing2 = [1, 2, 3, 3, 3, 4, 5, 6, 6]
@@ -33,6 +34,8 @@ def IsNegative(word, nextword, wordafterthat):
 	return False
 
 def VerbParse(strthing):
+	subs = parsesub(strthing)
+	print(subs, "<---subs")
 	strthing = strthing.replace(".", ",")
 	sentances = strthing.split(",")
 	for sentance in sentances:
