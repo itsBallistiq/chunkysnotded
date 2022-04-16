@@ -43,6 +43,7 @@ def subverb(parenttree):
 			npfound = i
 		if "V" in i.label():
 			vfound = True
+		print(i)
 		if i.label() == "COORD":
 			coordfound = i
 	if vfound and coordfound != None:
@@ -66,4 +67,7 @@ def parsesub(strthing):
 		compressedsubs.append(subconvert(np)) 
 	return compressedsubs
 
+strthing = input("enter a sentence to conjugate -> ").lower()
+print(parsesub(strthing))
+#look for VINF checking (VN in vinf), Ssub, Srel
 #we need to get the location of the subjects that we are returning, so that we can append it to the subjects key in the dictionary. for multiple subjects, it should just work if we take the farthest part of the subject to the right as the index.
