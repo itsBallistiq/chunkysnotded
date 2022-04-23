@@ -1,19 +1,13 @@
 from verbecc import Conjugator
-from napoleanbenepar import parsesub
 cg = Conjugator(lang='fr')
 subjects = ["je", "tu", "il", "elle", "on", "nous", "vous", "ils", "elles"]
 plursing2 = [1, 2, 3, 3, 3, 4, 5, 6, 6]
 verbs = open("verbs.txt", "r", encoding="utf8").read().splitlines()
 preference = open("preference.txt", "r", encoding="utf8").read().splitlines()
 passe = ['ai', 'as', 'a', 'avons', 'avez', 'vont', 'suis', 'es', 'est','sommes', 'êtes', 'sont']
-strthing = input("enter a sentence to conjugate -> ").lower()
 
-dictionary = {
-	"subject": [],
-	"conjugatables": [],
-	"infinitives": [],
-	"pasttense": []
-}
+
+
 
 def GoThrough(word, index):
 	for i in dictionary["infinitives"]:
@@ -34,49 +28,52 @@ def IsNegative(word, nextword, wordafterthat):
 	return False
 
 def VerbParse(strthing):
-	subs = parsesub(strthing)
-	print(subs, "<---subs")
-	strthing = strthing.replace(".", ",")
-	sentances = strthing.split(",")
-	for sentance in sentances:
-		words = sentance.split(" ")
-		while "" in words:
-			words.remove("")
-		for i in range(len(words)):
-			if i < len(words):
-				word = words[i]
-			if word in subjects:
-				dictionary["subject"].append([word, i])
-			if i < len(words)-1 and word == "aller" and (words[i+1] in verbs or words[i+2] in verbs):
-				if IsNegative(word, words[i+1], words[i+2]):
-					dictionary["infinitives"].append([words[i+2], i+2])
-				else:
-					dictionary["infinitives"].append([words[i+1], i+1])
-				dictionary["conjugatables"].append([word, i])
-			elif i < len(words)-1 and (word == "avoir" or word == "être") and (words[i+1] in verbs or words[i+2] in verbs):
-				if IsNegative(word, words[i+1], words[i+2]):
-					dictionary["pasttense"].append([words[i+2], i+2])
-				else:
-					dictionary["pasttense"].append([words[i+1], i+1])
-				dictionary["conjugatables"].append([word, i])
-			elif word in preference:
-				if IsNegative(word, words[i+1], words[i+2]):
-					dictionary["infinitives"].append([words[i+2], i+2])
-				else:
-					dictionary["infinitives"].append([words[i+1], i+1])
-				dictionary["conjugatables"].append([word, i])
-			elif word in verbs and GoThrough(word, i):
-				dictionary["conjugatables"].append([word, i])
+	#subs = parsesub(strthing)
+	#print(subs, "<---subs")
+
+  #for sentance in sentances:
+  words = strthing.split(" ")
+  while "" in words:
+    words.remove("")
+  for i in range(len(words)):
+    if i < len(words):
+      word = words[i]
+    if word in subjects:
+      dictionary["subject"].append([word, i])
+    try:
+      if i < len(words)-1 and word == "aller" and (words[i+1] in verbs or words[i+2] in verbs):
+        if IsNegative(word, words[i+1], words[i+2]):
+          dictionary["infinitives"].append([words[i+2], i+2])
+        else:
+          dictionary["infinitives"].append([words[i+1], i+1])
+        dictionary["conjugatables"].append([word, i])
+      elif i < len(words)-1 and (word == "avoir" or word == "être") and (words[i+1] in verbs):
+        dictionary["pasttense"].append([words[i+1], i+1])
+        dictionary["conjugatables"].append([word, i])
+      elif i < len(words)-1 and (word == "avoir" or word == "être") and (words[i+1] in verbs or words[i+2] in verbs):
+        if IsNegative(word, words[i+1], words[i+2]):
+          dictionary["pasttense"].append([words[i+2], i+2])
+        else:
+          dictionary["pasttense"].append([words[i+1], i+1])
+        dictionary["conjugatables"].append([word, i])
+      elif word in preference:
+        if IsNegative(word, words[i+1], words[i+2]):
+          dictionary["infinitives"].append([words[i+2], i+2])
+        else:
+          dictionary["infinitives"].append([words[i+1], i+1])
+        dictionary["conjugatables"].append([word, i])
+    except:
+      pass
+    if word in verbs and GoThrough(word, i):
+      dictionary["conjugatables"].append([word, i])
 
 
 
 def Conjugate():
-	print(dictionary)
 	for i in range(len(dictionary["subject"])):
-		checksub = False
 		if i < len(dictionary["subject"]):
 			sub = dictionary["subject"][i][0]
-			sublocate = dictionary["subject"][i][1]
+			#sublocate = dictionary["subject"][i][1]
 			if i < len(dictionary["subject"])-1:
 				nexsublocate = dictionary["subject"][i+1][1]
 			else:
@@ -117,20 +114,49 @@ def Conjugate():
 									dictionary["pasttense"][j][0] = converb[2]
 
 def Construct(strthing):
-	dictindex = ["subject", "conjugatables", "infinitives", "pasttense"]
-	strthing = strthing.replace(".", ",")
-	strthing = strthing.replace(",", " ")
-	strthing = strthing.split(" ")
-	finalstring = ""
-	for i in range(len(dictionary)):
-		for j in dictionary[dictindex[i]]:
-			strthing[j[1]] = j[0]
-	for i in strthing:
-		finalstring = finalstring + i + " "
-	return finalstring
+  vowels = ["a", "e", "h", "i", "o", "u", "y", "é", "à", "è", "ù", "â", "ê", "î", "ô", "û", "ë", "ï", "ü"]
+  dictindex = ["subject", "conjugatables", "infinitives", "pasttense"]
+  strthing = strthing.split(" ")
+  finalstring = ""
+  for i in range(len(dictionary)):
+    for j in dictionary[dictindex[i]]:
+      strthing[j[1]] = j[0]
+  for i in range(len(strthing)):
+    try:
+      if strthing[i] != strthing[i-1]:
+        finalstring = finalstring + strthing[i] + " "
+    except:
+      finalstring = finalstring + strthing[i] + " "
+  for j in range(len(finalstring)):
+    if j + 5 != len(finalstring):
+      for i in vowels:
+        if finalstring[j:j+4] == "je " + i:
+          finalstring = finalstring.replace(finalstring[j:j+4], ("j'" + i))
+        if finalstring[j:j+4] == "ne " + i:
+          finalstring = finalstring.replace(finalstring[j:j+4], ("n'" + i))
+        if finalstring[j:j+4] == "de " + i:
+          finalstring = finalstring.replace(finalstring[j:j+4], ("d'" + i))
+  
+  
+  return finalstring
 
 
 #print(converbs)
-VerbParse(strthing)
-Conjugate()
-print(Construct(strthing))
+strthing = input("enter a sentence to conjugate (verbs at the infinitive) -> ").lower()
+sentances = strthing.split(".")
+if len(sentances) == 1:
+  print(len(sentances), "Sentence Found. Conjugating...")
+else:
+  print(len(sentances), "Sentences Found. Conjugating...")
+for sentance in sentances:
+  dictionary = {
+	"subject": [],
+	"conjugatables": [],
+	"infinitives": [],
+	"pasttense": []
+}
+  VerbParse(sentance)
+  print(dictionary)
+  Conjugate()
+  print(dictionary)
+  print("Congjugated Sentence: ", Construct(sentance))

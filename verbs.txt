@@ -198,3 +198,4 @@ pêcher
 rougir
 tousser
 pleurer
+courir

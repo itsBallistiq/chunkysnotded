@@ -7,3 +7,7 @@ savoir
 pouvoir
 vouloir
 devoir
+arriver
+faire
+falloir
+choisir

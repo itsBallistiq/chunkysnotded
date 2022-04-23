@@ -23,90 +23,78 @@ tests = {
 	"je entendre l'annonce du départ de notre train": ["je"],
 	"nous perdre patience quand le train du retard": ["nous"],
 	"le contrôleur répondre aux questions des voyageurs": ["il"],
-	"vous descendre à quell arrêt": ["vous"],
-	"moi, je descendre à toulouse": ["je"]
+	"vous descendre à quel arrêt": ["vous"],
+	"moi, je descendre à toulouse": ["je"],
+	"": [""]
 }
 
-# Used to download language models
-# try:
-#     _create_unverified_https_context = ssl._create_unverified_context
-# except AttributeError:
-#     pass
-# else:
-#     ssl._create_default_https_context = _create_unverified_https_context
-# benepar.download('benepar_fr2') # French Model
+labellogic = {
+	"NP": [["NC", "COORD", "Srel", "NP", "NPP", "PRO", "SINT", "Ssub"], ["COORD"]],
+	"NPP": [["NP", "COORD"], ["COORD"]],
+	"COORD": [["NP", "NPP", "VN"], ["VPinf", "NPP", "NP"]],
+	"VPinf": [["VINF", "VN", "COORD"], [""]],
+	"VN": [["CLS", "CLO"], ["COORD", "SINT", "VPinf"]],
+	"SINT": [["VN"], [""]],
+	"Ssub": [["NP"], ["NP"]],
+	"Srel": [["NP"], ["NP"]],
+	"PRO": [[""], ["NP"]],
+	"NC": [[""], ["NP"]],
+	"CLS": [[""], ["VN"]],
+	"CLO": [[""], ["VN"]], 
+}
 
 parser = benepar.Parser("benepar_fr2")
 nlp = spacy.load('fr_core_news_lg')
+subfound = False
+profound = False
+coordfound = None
+verbfound = False
+def thankspython():
+	global subfound, profound, coordfound, verbfound
+	del subfound, profound, coordfound, verbfound
+	subfound = False
+	profound = False
+	coordfound = None
+	verbfound = False
 
-# if spacy.__version__.startswith('2'):
-#     nlp.add_pipe(benepar.BeneparComponent("benepar_fr2"))
-# else:
-#     nlp.add_pipe("benepar", config={"model": "benepar_fr2"})
-# def subconvert(tree):
-# 	print(tree)
-# 	subs = []
-# 	if len(tree) > 1:
-
-# 		for i in tree:
-# 			if i.label() == "COORD":
-# 				subs.append(subconvert(i[1]))
-# 			else:
-# 				subs.append(i[0])
-# 	else:
-# 		return None
-# 	if "moi" in subs or "nous" in subs:
-# 		return "nous"
-# 	if "toi" in subs or "vous" in subs:
-# 		return "vous"
-# 	if len(subs) == 1:
-# 		if subs[0] in subjects:
-# 			return subs[0]
-# 		return "il"
-# 	else:
-# 		return "ils"
-
-# def vnhassub(tree):
-# 	if type(tree.child)
-# 	for i in tree:
-# 		if i.label() == "NC" or i.label() == "CLS":
-# 			return True
-# 	return False
-# 	#when in doubt do a recursive a1out
-
-# def subverb(parenttree):
+def subverb(strthing):
+	global subfound, profound, coordfound, verbfound
 	
-# 	npfound = None
-# 	coordfound = None
-# 	vfound = False
-# 	for i in parenttree:
-# 		if i.label() == "VN" and vnhassub(i):
-# 			npfound = subverb(i)
-# 		if i.label() == "NPP" or i.label() == "NP" or i.label() == "NC" or i.label() == "CLS" and npfound == None:
-# 			npfound = i
-# 		if "V" in i.label():
-# 			vfound = True
-# 		if i.label() == "COORD": 
-# 			coordfound = i
-# 		if "Srel" == i.label() or i.label() == "Ssub":
-# 			subverb(i)
-# 	if vfound and coordfound != None:
-# 		return npfound, subverb(coordfound)
-# 	elif vfound:
-# 		return npfound
-# 	else:
-# 		return None
+	print("sub me ---> " ,subfound)
+	for j in range(len(strthing)):
+		if len(strthing[j])>1:
+			if type(strthing[j][0]) == str:
+				strthing = str(strthing).replace("(", "")
+				strthing = strthing.replace(")", "")
+				strthing = strthing.split(" ")
+				if strthing[0] == "NC"  or strthing[0] == "CLS" or strthing[0] == "CLO" or strthing[0] == "NPP":
+					subfound = True 
+				if strthing[0] == "PRO":
+					profound = True
+				if strthing[0] == "COORD":
+					coordfound = True
+				if strthing[0] == "VPinf" or strthing[0] == "V" or strthing[0] == "VINF":
+					verbfound = True
+			else:	
+				for i in range(len(strthing[j])):
+					subverb(strthing[j][i])
+	return subfound, profound, coordfound, verbfound
+
+
+
+
 
 def parsesub(strthing):
-	#sentence = "pommes et toi adorer manger des pommes, et pommes aimer manger des pommes"
 	sentence_words = strthing.split(" ")
 	input_sentence = benepar.InputSentence(
 		words = sentence_words
 		)
 	parsley = parser.parse(input_sentence)
 	sent = parsley[0]
-	print("sent:",sent)
-	# nps = subverb(sent)
+	nps = subverb(sent)
+	for np in nps:
+		print (np)
+	thankspython()
 	# compressedsubs = []
 	# if len(nps) == 2:
 	# 	compressedsubs.append(subconvert(nps))
@@ -128,5 +116,8 @@ else:
 			print("test: <" + test + "> has failed, returned: ", answer)
 
 print(parsesub(strthing))
-#look for VINF checking (VN in vinf), Ssub, Srel
+#need to change coord to actually work with multiple subjects
+#need to figure out how to use global variables
+#need to figureout how to use python
+#i hate this it sucks so badly
 #we need to get the location of the subjects that we are returning, so that we can append it to the subjects key in the dictionary. for multiple subjects, it should just work if we take the farthest part of the subject to the right as the index.
